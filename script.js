@@ -5,9 +5,30 @@ const invalid_input = document.getElementById("invalid_input");
 const data_container = document.getElementById("data_container");
 
 const verifyString = (value) => {
-  const regExp = /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/;
+  //Changed for better validation, it was accepting things like htt://
+  const regExp =
+    /^(((https|http):\/\/)|)[(a-zA-Z0-9)@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/;
 
   return new RegExp(regExp).test(value);
+};
+
+const mockedServer = async (url) => {
+  return new Promise((resolve) =>
+    setTimeout(() => {
+      if (Date.now() % 2 === 0)
+        resolve({
+          type: "FILE",
+          name: "mock.pdf",
+          url,
+        });
+      else
+        resolve({
+          type: "FOLDER",
+          name: "my_folder",
+          url,
+        });
+    }, 700)
+  );
 };
 
 const callServer = async () => {
@@ -24,18 +45,16 @@ const callServer = async () => {
     )
   */
 
-  if (Date.now() % 2 === 0) {
-    data_container.innerHTML = `
-       <p><b>Is File: </b> true<br/>
-          <b>File Name:</b> mock.pdf<br/>
-          <b>URL: </b>${input.value}</p>
-    `;
-  } else {
-    data_container.innerHTML = `
-       <p><b>Is Folder: </b> true<br/>                <b>Folder Name: </b> my_folder<br/>
-          <b>URL: </b>${input.value}</p>
-    `;
-  }
+  const url = input.value;
+  const response = await mockedServer(url);
+
+  data_container.innerHTML = `
+      <p><b>Type: </b> ${response.type}<br/>
+      <b>Name:</b> ${response.name}<br/>
+      <b>URL: </b>${input.value}</p>
+  `;
+
+  data_container.style.display = "block";
 };
 
 input.addEventListener("keyup", () => {
@@ -45,14 +64,13 @@ input.addEventListener("keyup", () => {
 });
 
 input.addEventListener("input", (e) => {
+  data_container.style.display = "none";
+
   if (e.target.value === "") {
-    data_container.style.display = "none";
     return (invalid_input.style.display = "none");
   } else if (!verifyString(e.target.value)) {
-    data_container.style.display = "none";
     return (invalid_input.style.display = "block");
   }
 
-  data_container.style.display = "block";
   return (invalid_input.style.display = "none");
 });
