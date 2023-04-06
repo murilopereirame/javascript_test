@@ -5,8 +5,9 @@ const invalid_input = document.getElementById("invalid_input");
 const data_container = document.getElementById("data_container");
 
 const verifyString = (value) => {
+  //Changed for better validation, it was accepting things like htt://
   const regExp =
-    /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/;
+    /^(((https|http):\/\/)|)[(a-zA-Z0-9)@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/;
 
   return new RegExp(regExp).test(value);
 };
